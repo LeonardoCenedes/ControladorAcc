@@ -17,9 +17,9 @@ public class GerenciadorAtividade {
         this.gerenciadorCursos = gerenciadorCursos;
     }
 
-    public boolean preencherDadosAtividade(String nomeAtividade, String descricao, LocalDateTime data, int raUsuario, UUID idCurso, Tipo tipo, int totalHoras) {
+    public boolean preencherDadosAtividade(String nomeAtividade,LocalDateTime data, String descricao,  int raUsuario, UUID idCurso, Tipo tipo, int totalHoras, String documento) {
         if (validarDadosAtividade(nomeAtividade, descricao, data, raUsuario, idCurso)) {
-            Atividade novaAtividade = new Atividade(nomeAtividade, data, "Pendente", descricao, raUsuario, idCurso, tipo, totalHoras);
+            Atividade novaAtividade = new Atividade(nomeAtividade, data, "Pendente", descricao, raUsuario, idCurso, tipo, totalHoras, documento);
             atividades.add(novaAtividade);
             return true;
         }

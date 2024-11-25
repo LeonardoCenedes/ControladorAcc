@@ -1,15 +1,17 @@
 package models;
 
+import java.util.UUID;
+
 public class Estudante {
     private int ra;
     private String nome;
     private String cpf;
     private String email;
     private String senha;
-    private String idCurso;
+    private UUID idCurso;
     private double totalHoras;
 
-    public Estudante(int ra, String nome, String cpf, String email, String senha, String idCurso) {
+    public Estudante(int ra, String nome, String cpf, String email, String senha, UUID idCurso) {
         this.ra = ra;
         this.nome = nome;
         this.cpf = cpf;
@@ -31,11 +33,11 @@ public class Estudante {
         this.totalHoras += horas;
     }
 
-    public String getIdCurso() {
+    public UUID getIdCurso() {
         return idCurso;
     }
 
-    public void setIdCurso(String idCurso) {
+    public void setIdCurso(UUID idCurso) {
         this.idCurso = idCurso;
     }
 

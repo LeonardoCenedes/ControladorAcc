@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import models.Curso;
 import models.Estudante;
 
 public class GerenciadorEstudante {
@@ -15,28 +16,28 @@ public class GerenciadorEstudante {
         this.estudantes = new ArrayList<>();
     }
 
-    public boolean inserirDadosEstudante(String email, String senha) {
+    public int inserirDadosEstudante(String email, String senha) {
         if (validarDadosEstudante(email, senha)) {
             return autenticarEstudante(email, senha);
         }
-        return false;
+        return 0;
     }
 
     public boolean validarDadosEstudante(String email, String senha) {
         return validarEmailInstitucional(email) && validarSenha(senha);
     }
 
-    public boolean autenticarEstudante(String email, String senha) {
+    public int autenticarEstudante(String email, String senha) {
         Estudante estudante = buscarPeloEmail(email);
         if (estudante == null) {
-            return false;
+            return 0;
         }
-        return estudante.getSenha().equals(senha);
+        return estudante.getSenha().equals(senha) ? estudante.getId() : null;
     }
 
     public boolean inserirDadosRegistro(int ra, String nome, String cpf, String email, String senha, UUID idCurso) {
         if (validarDadosRegistro(ra, nome, cpf, email, senha, idCurso)) {
-            Estudante novoEstudante = new Estudante(ra, nome, cpf, email, senha, idCurso.toString());
+            Estudante novoEstudante = new Estudante(ra, nome, cpf, email, senha, idCurso);
             estudantes.add(novoEstudante);
             return true;
         }
@@ -154,5 +155,23 @@ public class GerenciadorEstudante {
             }
         }
         return false;
+    }
+
+    public String buscarNomePeloRa(int ra) {
+        for (Estudante estudante : estudantes) {
+            if (estudante.getId() == ra) {
+                return estudante.getNome();
+            }
+        }
+        return null;
+    }
+
+    public Curso buscarCursoPeloRa(int ra) {
+        for (Estudante estudante : estudantes) {
+            if (estudante.getId() == ra) {
+                return gerenciadorCursos.buscarCurso(estudante.getIdCurso());
+            }
+        }
+        return null;
     }
 }

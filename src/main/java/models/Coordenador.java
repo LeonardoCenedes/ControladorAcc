@@ -27,8 +27,8 @@ public class Coordenador {
         this.idCurso = idCurso;
     }
 
-    public String getId() {
-        return id.toString();
+    public UUID getId() {
+        return id;
     }
 
     public String getNome() {

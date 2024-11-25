@@ -13,7 +13,6 @@ public class GerenciadorCoordenador {
     private GerenciadorCursos gerenciadorCursos;
     private GerenciadorEstudante gerenciadorEstudante;
 
-
     public GerenciadorCoordenador(GerenciadorAtividade gerenciadorAtividade, GerenciadorCursos gerenciadorCursos, GerenciadorEstudante gerenciadorEstudante) {
         this.coordenadores = new ArrayList<>();
         this.gerenciadorAtividade = gerenciadorAtividade;
@@ -23,11 +22,40 @@ public class GerenciadorCoordenador {
 
     public boolean inserirDadosCoordenador(String nome, String cpf, String email, String senha, UUID idCurso) {
         if (validarDadosCoordenador(nome, cpf, email, senha, idCurso)) {
-            Coordenador novoCoordenador = new Coordenador(nome, cpf, email, senha, idCurso);
+            Coordenador novoCoordenador = new Coordenador(nome, email,senha, cpf,  idCurso);
             coordenadores.add(novoCoordenador);
             return true;
         }
         return false;
+    }
+
+    public boolean validarDadosAutenticarCoordenador(String email, String senha) {
+        return validarEmailCoordenador(email) && validarSenhaCoordenador(senha);
+    }
+
+    public UUID inserirDadosAutenticarCoordenador(String email, String senha) {
+        if (validarDadosAutenticarCoordenador(email, senha)) {
+            return autenticarCoordenador(email, senha);
+        }
+        return null;
+    }
+
+    public UUID autenticarCoordenador(String email, String senha) {
+        Coordenador coordenador = buscarPeloEmail(email);
+        if (coordenador == null) {
+            return null;
+        }
+        return coordenador.getSenha().equals(senha) ? coordenador.getId() : null;
+    }
+
+    private Coordenador buscarPeloEmail(String email) {
+        for (Coordenador coordenador : coordenadores) {
+            System.out.println(coordenador.getEmail());
+            if (coordenador.getEmail().equals(email)) {
+                return coordenador;
+            }
+        }
+        return null;
     }
 
     public boolean validarDadosCoordenador(String nome, String cpf, String email, String senha, UUID idCurso) {

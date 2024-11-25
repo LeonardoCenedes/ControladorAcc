@@ -1,5 +1,6 @@
 package controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -7,6 +8,10 @@ import models.Curso;
 
 public class GerenciadorCursos {
     private List<Curso> cursos;
+
+    public GerenciadorCursos() {
+        this.cursos = new ArrayList<>();
+    }
 
     public boolean inserirDadosCurso(String nome, int limiteHoras) {
         if (validarDadosCurso(nome, limiteHoras)) {
@@ -26,7 +31,7 @@ public class GerenciadorCursos {
             return false;
         }
     
-        return nome.matches("[a-zA-Z]{6,32}");
+        return nome.matches("^[\\p{L}\\s]{6,32}$");
     }
 
     public boolean validarLimiteHoras(int limiteHoras) {
@@ -75,4 +80,5 @@ public class GerenciadorCursos {
     public List<Curso> listarCursos() {
         return cursos;
     }
+    
 }

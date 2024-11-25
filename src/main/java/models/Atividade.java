@@ -20,12 +20,12 @@ public class Atividade {
         MONITORIA
     }
 
-    public Atividade(String nomeAtividade, LocalDateTime dataRealizacao, String status, String descricao, int raUsuario, UUID idCurso, Tipo tipo, int totalHoras) {
+    public Atividade(String nomeAtividade, LocalDateTime dataRealizacao, String status, String descricao, int raUsuario, UUID idCurso, Tipo tipo, int totalHoras, String documento) {
         this.id = UUID.randomUUID();
         this.nomeAtividade = nomeAtividade;
         this.dataRealizacao = dataRealizacao;
         this.status = status;
-        this.documento = "";
+        this.documento = documento;
         this.descricao = descricao;
         this.raUsuario = raUsuario;
         this.idCurso = idCurso;
@@ -107,6 +107,18 @@ public class Atividade {
 
     public void setdescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public int getRaAluno() {
+        return raUsuario;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public LocalDateTime getData() {
+        return dataRealizacao;
     }
 
     @Override
