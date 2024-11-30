@@ -2,7 +2,6 @@ package controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import models.Curso;
 
@@ -38,17 +37,17 @@ public class GerenciadorCursos {
         return limiteHoras > 10 && limiteHoras < 500;
     }
 
-    public Curso buscarCurso(UUID idCurso) {
+    public Curso buscarCurso(String nome) {
         for (Curso curso : cursos) {
-            if (curso.getId().equals(idCurso)) {
+            if (curso.getNome().equals(nome)) {
                 return curso;
             }
         }
         return null;
     }
 
-    public boolean editarCurso(UUID idCurso, String nome, Integer limiteHoras) {
-        Curso curso = buscarCurso(idCurso);
+    public boolean editarCurso(String nome, Integer limiteHoras) {
+        Curso curso = buscarCurso(nome);
         if (curso == null) {
             return false;
         }
@@ -68,9 +67,9 @@ public class GerenciadorCursos {
         this.cursos.remove(curso);
     }
 
-    public boolean validarIdCurso(UUID idCurso) {
+    public boolean validarNomeExistenteCurso(String nome) {
         for (Curso curso : cursos) {
-            if (curso.getId().equals(idCurso)) {
+            if (curso.getNome().equals(nome)) {
                 return true;
             }
         }

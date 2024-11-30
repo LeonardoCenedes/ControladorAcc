@@ -3,10 +3,9 @@ package controllers;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import models.Atividade;
-import models.Atividade.Tipo;
+import models.TipoAtividade;
 
 public class GerenciadorAtividade {
     private List<Atividade> atividades;
@@ -17,21 +16,21 @@ public class GerenciadorAtividade {
         this.gerenciadorCursos = gerenciadorCursos;
     }
 
-    public boolean preencherDadosAtividade(String nomeAtividade,LocalDateTime data, String descricao,  int raUsuario, UUID idCurso, Tipo tipo, int totalHoras, String documento) {
-        if (validarDadosAtividade(nomeAtividade, descricao, data, raUsuario, idCurso)) {
-            Atividade novaAtividade = new Atividade(nomeAtividade, data, "Pendente", descricao, raUsuario, idCurso, tipo, totalHoras, documento);
+    public boolean preencherDadosAtividade(String nomeAtividade,LocalDateTime data, String descricao,  int raUsuario, String nomeCurso, TipoAtividade tipo, int totalHoras, String documento) {
+        if (validarDadosAtividade(nomeAtividade, descricao, data, raUsuario, nomeCurso)) {
+            Atividade novaAtividade = new Atividade(nomeAtividade, data, "Pendente", descricao, raUsuario, nomeCurso, tipo, totalHoras, documento);
             atividades.add(novaAtividade);
             return true;
         }
         return false;
     }
 
-    public boolean validarDadosAtividade(String nomeAtividade, String descricao, LocalDateTime data, int raUsuario, UUID idCurso) {
+    public boolean validarDadosAtividade(String nomeAtividade, String descricao, LocalDateTime data, int raUsuario, String nome) {
         return validarNomeAtividade(nomeAtividade) &&
                validarDescricao(descricao) &&
                validarData(data) &&
                validarRa(raUsuario) &&
-               gerenciadorCursos.validarIdCurso(idCurso);
+               gerenciadorCursos.validarNomeExistenteCurso(nome);
     }
 
     public boolean validarNomeAtividade(String nomeAtividade) {
@@ -67,12 +66,11 @@ public class GerenciadorAtividade {
         return ra != 0;
     }
 
-    public boolean anexarDocumento(UUID idAtividade, String documento) {
-        for (Atividade atividade : atividades) {
-            if (atividade.getId().equals(idAtividade)) {
-                atividade.setDocumento(documento);
-                return true;
-            }
+    public boolean anexarDocumento(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso, String documento) {
+        Atividade atividade = procurarAtividade(nomeAtividade, data, raUsuario, nomeCurso);
+        if (atividade != null) {
+            atividade.setDocumento(documento);
+            return true;
         }
         return false;
     }
@@ -84,25 +82,15 @@ public class GerenciadorAtividade {
         return documento.toLowerCase().endsWith(".pdf");
     }
 
-    public Atividade buscarAtividade(UUID idAtividade) {
-        for (Atividade atividade : atividades) {
-            if (atividade.getId().equals(idAtividade)) {
-                return atividade;
-            }
-        }
-        return null;
-    }
-
     public List<Atividade> buscarAtividades() {
         return atividades;
     }
 
-    public boolean atualizarStatusAtividade(UUID idAtividade, String status) {
-        for (Atividade atividade : atividades) {
-            if (atividade.getId().equals(idAtividade)) {
-                atividade.setStatus(status);
-                return true;
-            }
+    public boolean atualizarStatusAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso, String status) {
+        Atividade atividade = procurarAtividade(nomeAtividade, data, raUsuario, nomeCurso);
+        if (atividade != null) {
+            atividade.setStatus(status);
+            return true;
         }
         return false;
     }
@@ -127,12 +115,11 @@ public class GerenciadorAtividade {
         return atividadesPorStatus;
     }
 
-    public boolean deletarAtividade(UUID idAtividade) {
-        for (Atividade atividade : atividades) {
-            if (atividade.getId().equals(idAtividade)) {
-                atividades.remove(atividade);
-                return true;
-            }
+    public boolean deletarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
+        Atividade atividade = procurarAtividade(nomeAtividade, data, raUsuario, nomeCurso);
+        if (atividade != null) {
+            atividades.remove(atividade);
+            return true;
         }
         return false;
     }
@@ -141,19 +128,49 @@ public class GerenciadorAtividade {
         this.atividades.remove(atividade);
     }
     
-    public double calcularHoras(Atividade.Tipo tipo, int totalHoras) {
-        double result = 0;
-        switch (tipo) {
-            case CURSO:
-                result = totalHoras * 0.3;
-                break;
-            case SEMINARIO:
-                result = totalHoras * 0.1;
-                break;
-            case MONITORIA:
-                result = totalHoras * 0.5;
-                break;
+    public double calcularHoras(TipoAtividade tipo, int totalHoras) {
+        return totalHoras * tipo.getCoeficienteHoras();
+    }
+
+    public Atividade procurarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
+        for (Atividade atividade : atividades) {
+            if (atividade.getNomeAtividade().equals(nomeAtividade) &&
+                atividade.getDataRealizacao().equals(data) &&
+                atividade.getRaUsuario() == raUsuario &&
+                atividade.getNomeCurso().equals(nomeCurso)) {
+                return atividade;
+            }
         }
-        return result;
+        return null;
+    }
+
+    public List<Atividade> buscarFiltradaPorRaeStatus(int ra, String status) {
+        List<Atividade> atividadesFiltradas = new ArrayList<>();
+        for (Atividade atividade : atividades) {
+            if (atividade.getRaUsuario() == ra && atividade.getStatus().equals(status)) {
+                atividadesFiltradas.add(atividade);
+            }
+        }
+        return atividadesFiltradas;
+    }
+
+    public List<Atividade> buscarPorCurso(String nomeCurso) {
+        List<Atividade> atividadesPorCurso = new ArrayList<>();
+        for (Atividade atividade : atividades) {
+            if (atividade.getNomeCurso().equals(nomeCurso)) {
+                atividadesPorCurso.add(atividade);
+            }
+        }
+        return atividadesPorCurso;
+    }
+
+    public List<Atividade> buscarPorCursoeStatus(String nomeCurso, String status) {
+        List<Atividade> atividadesPorCursoEStatus = new ArrayList<>();
+        for (Atividade atividade : atividades) {
+            if (atividade.getNomeCurso().equals(nomeCurso) && atividade.getStatus().equals(status)) {
+                atividadesPorCursoEStatus.add(atividade);
+            }
+        }
+        return atividadesPorCursoEStatus;
     }
 }

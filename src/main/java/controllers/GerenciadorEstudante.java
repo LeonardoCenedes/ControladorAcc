@@ -2,10 +2,10 @@ package controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import models.Curso;
 import models.Estudante;
+import models.TipoAtividade;
 
 public class GerenciadorEstudante {
     private List<Estudante> estudantes;
@@ -32,25 +32,25 @@ public class GerenciadorEstudante {
         if (estudante == null) {
             return 0;
         }
-        return estudante.getSenha().equals(senha) ? estudante.getId() : null;
+        return estudante.getSenha().equals(senha) ? estudante.getRa() : null;
     }
 
-    public boolean inserirDadosRegistro(int ra, String nome, String cpf, String email, String senha, UUID idCurso) {
-        if (validarDadosRegistro(ra, nome, cpf, email, senha, idCurso)) {
-            Estudante novoEstudante = new Estudante(ra, nome, cpf, email, senha, idCurso);
+    public boolean inserirDadosRegistro(int ra, String nome, String cpf, String email, String senha, String nomeCurso) {
+        if (validarDadosRegistro(ra, nome, cpf, email, senha, nomeCurso)) {
+            Estudante novoEstudante = new Estudante(ra, nome, cpf, email, senha, nomeCurso);
             estudantes.add(novoEstudante);
             return true;
         }
         return false;
     }
 
-    public boolean validarDadosRegistro(int ra, String nome, String cpf, String email, String senha, UUID idCurso) {
+    public boolean validarDadosRegistro(int ra, String nome, String cpf, String email, String senha, String nomeCurso) {
         return validarRa(ra) &&
                validarNome(nome) &&
                validarCpf(cpf) &&
                validarEmailInstitucional(email) &&
                validarSenha(senha) &&
-               gerenciadorCursos.validarIdCurso(idCurso);
+               gerenciadorCursos.validarNomeExistenteCurso(nomeCurso);
     }
 
     public boolean validarEmailInstitucional(String email) {
@@ -147,19 +147,24 @@ public class GerenciadorEstudante {
         return null;
     }
 
-    public boolean atualizarHoras(int ra, double horas) {
-        for (Estudante estudante : estudantes) {
-            if (estudante.getId() == ra) {
-                estudante.somarHoras(horas);
-                return true;
+    public boolean atualizarHoras(int ra, double horas, TipoAtividade tipo) {
+    for (Estudante estudante : estudantes) {
+        if (estudante.getRa() == ra) {
+            estudante.somarHoras(horas);
+            for (TipoAtividade tipoAtividade : estudante.getTipoAtividades()) {
+                if (tipoAtividade.getNome().equals(tipo.getNome())) {
+                    tipoAtividade.adicionarHoras(horas);;
+                    return true;
+                }
             }
         }
-        return false;
     }
+    return false;
+}
 
     public String buscarNomePeloRa(int ra) {
         for (Estudante estudante : estudantes) {
-            if (estudante.getId() == ra) {
+            if (estudante.getRa() == ra) {
                 return estudante.getNome();
             }
         }
@@ -168,10 +173,28 @@ public class GerenciadorEstudante {
 
     public Curso buscarCursoPeloRa(int ra) {
         for (Estudante estudante : estudantes) {
-            if (estudante.getId() == ra) {
-                return gerenciadorCursos.buscarCurso(estudante.getIdCurso());
+            if (estudante.getRa() == ra) {
+                return gerenciadorCursos.buscarCurso(estudante.getNomeCurso());
             }
         }
         return null;
+    }
+
+    public Estudante buscarEstudantePeloRa(int ra) {
+        for (Estudante estudante : estudantes) {
+            if (estudante.getRa() == ra) {
+                return estudante;
+            }
+        }
+        return null;
+    }
+
+    public boolean addTipoAtividadePorCurso(String nomeCurso, String nomeTipo, int maxHoras, double coeficienteHoras) {
+        for (Estudante estudante : estudantes) {
+            if (estudante.getNomeCurso().equals(nomeCurso)) {
+                return estudante.addTipoAtividade(nomeTipo, maxHoras, coeficienteHoras);
+            }
+        }
+        return false;
     }
 }

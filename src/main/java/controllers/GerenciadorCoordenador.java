@@ -1,8 +1,8 @@
 package controllers;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import models.Atividade;
 import models.Coordenador;
@@ -20,9 +20,9 @@ public class GerenciadorCoordenador {
         this.gerenciadorEstudante = gerenciadorEstudante;
     }
 
-    public boolean inserirDadosCoordenador(String nome, String cpf, String email, String senha, UUID idCurso) {
-        if (validarDadosCoordenador(nome, cpf, email, senha, idCurso)) {
-            Coordenador novoCoordenador = new Coordenador(nome, email,senha, cpf,  idCurso);
+    public boolean inserirDadosCoordenador(String nome, String cpf, String email, String senha, String nomeCurso) {
+        if (validarDadosCoordenador(nome, cpf, email, senha, nomeCurso)) {
+            Coordenador novoCoordenador = new Coordenador(nome, email,senha, cpf,  nomeCurso);
             coordenadores.add(novoCoordenador);
             return true;
         }
@@ -33,19 +33,19 @@ public class GerenciadorCoordenador {
         return validarEmailCoordenador(email) && validarSenhaCoordenador(senha);
     }
 
-    public UUID inserirDadosAutenticarCoordenador(String email, String senha) {
+    public String inserirDadosAutenticarCoordenador(String email, String senha) {
         if (validarDadosAutenticarCoordenador(email, senha)) {
             return autenticarCoordenador(email, senha);
         }
         return null;
     }
 
-    public UUID autenticarCoordenador(String email, String senha) {
+    public String autenticarCoordenador(String email, String senha) {
         Coordenador coordenador = buscarPeloEmail(email);
         if (coordenador == null) {
             return null;
         }
-        return coordenador.getSenha().equals(senha) ? coordenador.getId() : null;
+        return coordenador.getSenha().equals(senha) && coordenador.getStatus().equals("Ativo") ? coordenador.getCpf() : null;
     }
 
     private Coordenador buscarPeloEmail(String email) {
@@ -58,12 +58,12 @@ public class GerenciadorCoordenador {
         return null;
     }
 
-    public boolean validarDadosCoordenador(String nome, String cpf, String email, String senha, UUID idCurso) {
+    public boolean validarDadosCoordenador(String nome, String cpf, String email, String senha, String nomeCurso) {
         return validarNomeCoordenador(nome) &&
                validarCpfCoordenador(cpf) &&
                validarEmailCoordenador(email) &&
                validarSenhaCoordenador(senha) &&
-               gerenciadorCursos.validarIdCurso(idCurso);
+               gerenciadorCursos.validarNomeExistenteCurso(nomeCurso);
     }
 
     public boolean validarNomeCoordenador(String nome) {
@@ -85,7 +85,7 @@ public class GerenciadorCoordenador {
             totalLength += word.length();
         }
 
-        return totalLength >= 8;
+        return totalLength >= 7;
     }
 
     public boolean validarCpfCoordenador(String cpf) {
@@ -147,18 +147,18 @@ public class GerenciadorCoordenador {
         return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
     }
 
-    public boolean negarAtividade(UUID idAtividade) {
-        return gerenciadorAtividade.atualizarStatusAtividade(idAtividade, "Negado");
+    public boolean negarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
+        return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario,nomeCurso , "Negado");
     }
 
-    public boolean aceitarAtividade(UUID idAtividade) {
-        Atividade atividade = gerenciadorAtividade.buscarAtividade(idAtividade);
+    public boolean aceitarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
+        Atividade atividade = gerenciadorAtividade.procurarAtividade(nomeAtividade,data, raUsuario, nomeCurso);
         if (atividade == null) {
             return false;
         }
-        double horas = gerenciadorAtividade.calcularHoras(atividade.getTipo(), atividade.getTotalHoras());
-        if(gerenciadorEstudante.atualizarHoras(atividade.getRaUsuario(), horas)) {
-            return gerenciadorAtividade.atualizarStatusAtividade(idAtividade, "Aceito");
+        double horas = gerenciadorAtividade.calcularHoras(atividade.getTipoAtividade(), atividade.getTotalHoras());
+        if(gerenciadorEstudante.atualizarHoras(atividade.getRaUsuario(), horas, atividade.getTipoAtividade())) {
+            return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario,nomeCurso , "Aprovada");
         }
         return false;
     }
@@ -169,5 +169,18 @@ public class GerenciadorCoordenador {
 
     public List<Coordenador> getCoordenadores() {
         return coordenadores;
+    }
+
+    public Coordenador buscarCoordenador(String cpf) {
+        for (Coordenador coordenador : coordenadores) {
+            if (coordenador.getCpf().equals(cpf)) {
+                return coordenador;
+            }
+        }
+        return null;
+    }
+
+    public boolean addTipoAtividade(String nome, int maxHoras, double coeficienteHoras, String nomeDoCurso) {
+        return gerenciadorEstudante.addTipoAtividadePorCurso(nomeDoCurso ,nome, maxHoras, coeficienteHoras);
     }
 }

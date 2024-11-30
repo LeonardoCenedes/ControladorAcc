@@ -1,6 +1,7 @@
 package models;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Estudante {
     private int ra;
@@ -8,17 +9,24 @@ public class Estudante {
     private String cpf;
     private String email;
     private String senha;
-    private UUID idCurso;
+    private String nomeCurso;
     private double totalHoras;
+    private List<TipoAtividade> tipoAtividades;
 
-    public Estudante(int ra, String nome, String cpf, String email, String senha, UUID idCurso) {
+    public Estudante(int ra, String nome, String cpf, String email, String senha, String nomeCurso) {
         this.ra = ra;
         this.nome = nome;
         this.cpf = cpf;
         this.email = email;
         this.senha = senha;
-        this.idCurso = idCurso;
+        this.nomeCurso = nomeCurso;
         this.totalHoras = 0;
+        this.tipoAtividades = new ArrayList<>();
+
+        this.tipoAtividades.add(new TipoAtividade("Cursos", 30, 0.3));
+        this.tipoAtividades.add(new TipoAtividade("Seminarios", 10, 0.1));
+        this.tipoAtividades.add(new TipoAtividade("Monitorias", 30, 0.3));
+        this.tipoAtividades.add(new TipoAtividade("SemanaAcademica", 40, 0.4));
     }
 
     public double getTotalHoras() {
@@ -33,19 +41,19 @@ public class Estudante {
         this.totalHoras += horas;
     }
 
-    public UUID getIdCurso() {
-        return idCurso;
+    public String getNomeCurso() {
+        return nomeCurso;
     }
 
-    public void setIdCurso(UUID idCurso) {
-        this.idCurso = idCurso;
+    public void setNomeCurso(String nomeCurso) {
+        this.nomeCurso = nomeCurso;
     }
 
     public void setId(int ra) {
         this.ra = ra;
     }
 
-    public int getId() {
+    public int getRa() {
         return ra;
     }
 
@@ -56,7 +64,6 @@ public class Estudante {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
 
     public String getCpf() {
         return cpf;
@@ -80,5 +87,19 @@ public class Estudante {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public List<TipoAtividade> getTipoAtividades() {
+        return tipoAtividades;
+    }
+
+    public boolean addTipoAtividade(String nome, int maxHoras, double coeficienteHoras) {
+        for (TipoAtividade tipoAtividade : tipoAtividades) {
+            if (tipoAtividade.getNome().equals(nome)) {
+                return false;
+            }
+        }
+        TipoAtividade novoTipoAtividade = new TipoAtividade(nome, maxHoras, coeficienteHoras);
+        return tipoAtividades.add(novoTipoAtividade);
     }
 }

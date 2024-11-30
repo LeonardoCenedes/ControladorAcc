@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.UUID;
 
 import controllers.GerenciadorAtividade;
 import controllers.GerenciadorCoordenador;
@@ -20,7 +19,7 @@ public class RegistrarCoordenador extends JFrame {
         setTitle("Registrar Coordenador");
 
         // Set the default close operation
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Create labels
         JLabel nomeLabel = new JLabel("Nome:");
@@ -64,9 +63,9 @@ public class RegistrarCoordenador extends JFrame {
                     String email = emailField.getText();
                     String senha = new String(senhaField.getPassword());
                     Curso selectedCurso = (Curso) cursosDropdown.getSelectedItem();
-                    UUID idCurso = selectedCurso.getId();
+                    String nomeCurso = selectedCurso.getNome();
 
-                    boolean success = gerenciadorCoordenador.inserirDadosCoordenador(nome, cpf, email, senha, idCurso);
+                    boolean success = gerenciadorCoordenador.inserirDadosCoordenador(nome, cpf, email, senha, nomeCurso);
                     if (!success) {
                         JOptionPane.showMessageDialog(RegistrarCoordenador.this, "Erro ao registrar coordenador", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else {

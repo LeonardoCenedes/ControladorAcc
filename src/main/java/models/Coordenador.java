@@ -1,34 +1,37 @@
 package models;
 
-import java.util.UUID;
-
 public class Coordenador {
-    private UUID id;
     private String nome;
     private String email;
     private String senha;  
     private String cpf;
-    private UUID idCurso;
+    private String nomeCurso;
+    private String statusConta;
+    
 
-    public Coordenador(String nome, String email, String senha, String cpf, UUID idCurso) {
-        this.id = UUID.randomUUID();
+    public Coordenador(String nome, String email, String senha, String cpf, String nomeCurso) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.cpf = cpf;
-        this.idCurso = idCurso;
+        this.nomeCurso = nomeCurso;
+        this.statusConta = "Ativo";
     }
 
-    public UUID getIdCurso() {
-        return idCurso;
+    public String getStatus() {
+        return statusConta;
     }
 
-    public void setIdCurso(UUID idCurso) {
-        this.idCurso = idCurso;
+    public void setStatus(String status) {
+        this.statusConta = status;
     }
 
-    public UUID getId() {
-        return id;
+    public String getNomeCurso() {
+        return nomeCurso;
+    }
+
+    public void setNomeCurso(String nomeCurso) {
+        this.nomeCurso = nomeCurso;
     }
 
     public String getNome() {
@@ -66,7 +69,6 @@ public class Coordenador {
     @Override
     public String toString() {
         return "Coordenador{" +
-                "id=" + id +
                 ", nome='" + nome + '\'' +
                 ", email='" + email + '\'' +
                 ", senha='" + senha + '\'' +

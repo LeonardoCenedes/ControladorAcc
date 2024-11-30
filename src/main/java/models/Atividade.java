@@ -1,9 +1,8 @@
 package models;
+
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class Atividade {
-    private UUID id;
     private String nomeAtividade;
     private LocalDateTime dataRealizacao;
     private String status;
@@ -11,25 +10,18 @@ public class Atividade {
     private String descricao;
     private int totalHoras;
     private int raUsuario;
-    private UUID idCurso;
-    private Tipo tipo;
+    private String nomeCurso;
+    private TipoAtividade tipoAtividade;
 
-    public enum Tipo {
-        CURSO,
-        SEMINARIO,
-        MONITORIA
-    }
-
-    public Atividade(String nomeAtividade, LocalDateTime dataRealizacao, String status, String descricao, int raUsuario, UUID idCurso, Tipo tipo, int totalHoras, String documento) {
-        this.id = UUID.randomUUID();
+    public Atividade(String nomeAtividade, LocalDateTime dataRealizacao, String status, String descricao, int raUsuario, String nomeCurso, TipoAtividade tipoAtividade, int totalHoras, String documento) {
         this.nomeAtividade = nomeAtividade;
         this.dataRealizacao = dataRealizacao;
         this.status = status;
         this.documento = documento;
         this.descricao = descricao;
         this.raUsuario = raUsuario;
-        this.idCurso = idCurso;
-        this.tipo = tipo;
+        this.nomeCurso = nomeCurso;
+        this.tipoAtividade = tipoAtividade;
         this.totalHoras = totalHoras;
     }
 
@@ -41,20 +33,20 @@ public class Atividade {
         this.totalHoras = totalHoras;
     }
 
-    public Tipo getTipo() {
-        return tipo;
+    public TipoAtividade getTipoAtividade() {
+        return tipoAtividade;
     }
 
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
+    public void setTipoAtividade(TipoAtividade tipoAtividade) {
+        this.tipoAtividade = tipoAtividade;
     }
     
-    public UUID getIdCurso() {
-        return idCurso;
+    public String getNomeCurso() {
+        return nomeCurso;
     }
 
-    public void setIdCurso(UUID idCurso) {
-        this.idCurso = idCurso;
+    public void setNomeCurso(String nomeCurso) {
+        this.nomeCurso = nomeCurso;
     }
 
     public int getRaUsuario() {
@@ -63,10 +55,6 @@ public class Atividade {
 
     public void setRaUsuario(int raUsuario) {
         this.raUsuario = raUsuario;
-    }
-
-    public UUID getId() {
-        return id;
     }
 
     public String getNomeAtividade() {
@@ -101,11 +89,11 @@ public class Atividade {
         this.documento = documento;
     }
 
-    public String getdescricao() {
+    public String getDescricao() {
         return descricao;
     }
 
-    public void setdescricao(String descricao) {
+    public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
 
@@ -113,23 +101,26 @@ public class Atividade {
         return raUsuario;
     }
 
-    public String getDescricao() {
-        return descricao;
-    }
-
     public LocalDateTime getData() {
         return dataRealizacao;
+    }
+
+    public String getNomeTipo() {
+        return tipoAtividade.getNome();
     }
 
     @Override
     public String toString() {
         return "Atividade{" +
-                "id=" + id +
+                "raUsuario=" + raUsuario +
                 ", nomeAtividade='" + nomeAtividade + '\'' +
                 ", dataRealizacao=" + dataRealizacao +
                 ", status='" + status + '\'' +
                 ", documento='" + documento + '\'' +
                 ", descricao='" + descricao + '\'' +
+                ", totalHoras=" + totalHoras +
+                ", nomeCurso='" + nomeCurso + '\'' +
+                ", tipoAtividade=" + tipoAtividade +
                 '}';
     }
 }

@@ -8,16 +8,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
-import java.util.UUID;
 
 import org.jdatepicker.impl.*;
 
 import controllers.GerenciadorAtividade;
-import controllers.GerenciadorCursos;
 import controllers.GerenciadorEstudante;
-import models.Atividade;
+import controllers.GerenciadorCursos;
 import models.Curso;
+import models.Estudante;
+import models.TipoAtividade;
 
 public class CriarNovaAtividade extends JFrame {
 
@@ -28,7 +29,7 @@ public class CriarNovaAtividade extends JFrame {
         setTitle("Criar Nova Atividade");
 
         // Set the default close operation
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Create labels
         JLabel nomeAtividadeLabel = new JLabel("Nome da Atividade:");
@@ -51,8 +52,22 @@ public class CriarNovaAtividade extends JFrame {
         descricaoField.setPreferredSize(new Dimension(200, 75));
         totalHorasField.setPreferredSize(new Dimension(200, 25));
 
-        // Create dropdown for Tipo
-        JComboBox<Atividade.Tipo> tipoDropdown = new JComboBox<>(Atividade.Tipo.values());
+        // Fetch the Estudante object using the ra
+        Estudante estudante = gerenciadorEstudante.buscarEstudantePeloRa(ra);
+
+        // Create dropdown for TipoAtividade
+        List<TipoAtividade> tipoAtividades = estudante.getTipoAtividades();
+        JComboBox<TipoAtividade> tipoDropdown = new JComboBox<>(tipoAtividades.toArray(new TipoAtividade[0]));
+        tipoDropdown.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof TipoAtividade) {
+                    setText(((TipoAtividade) value).getNome());
+                }
+                return c;
+            }
+        });
         tipoDropdown.setPreferredSize(new Dimension(200, 25));
 
         // Create date picker
@@ -179,14 +194,14 @@ public class CriarNovaAtividade extends JFrame {
             Date selectedDate = (Date) datePicker.getModel().getValue();
             LocalDateTime data = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
             int totalHoras = Integer.parseInt(totalHorasField.getText());
-            Atividade.Tipo tipo = (Atividade.Tipo) tipoDropdown.getSelectedItem();
+            TipoAtividade tipo = (TipoAtividade) tipoDropdown.getSelectedItem();
 
             // Get the UUID of the curso of the user from the ra
             Curso curso = gerenciadorEstudante.buscarCursoPeloRa(ra);
-            UUID idCurso = curso != null ? curso.getId() : null;
+            String nomeCurso = curso != null ? curso.getNome() : null;
 
             // Call preencherDadosAtividade
-            boolean success = gerenciadorAtividade.preencherDadosAtividade(nomeAtividade, data, descricao, ra,idCurso, tipo,  totalHoras, selectedFilePath);
+            boolean success = gerenciadorAtividade.preencherDadosAtividade(nomeAtividade, data, descricao, ra, nomeCurso, tipo, totalHoras, selectedFilePath);
             if (!success) {
                 JOptionPane.showMessageDialog(CriarNovaAtividade.this, "Dados inválidos, tente novamente", "Erro", JOptionPane.ERROR_MESSAGE);
             } else {

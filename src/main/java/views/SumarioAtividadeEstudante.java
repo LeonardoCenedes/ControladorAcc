@@ -6,10 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import controllers.GerenciadorCursos;
 import models.Atividade;
 import models.Curso;
+import models.TipoAtividade;
 
 public class SumarioAtividadeEstudante extends JFrame {
 
@@ -18,10 +20,10 @@ public class SumarioAtividadeEstudante extends JFrame {
         setTitle("Sumário da Atividade");
 
         // Set the default close operation
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Fetch the course information using GerenciadorCursos
-        Curso curso = gerenciadorCursos.buscarCurso(atividade.getIdCurso());
+        Curso curso = gerenciadorCursos.buscarCurso(atividade.getNomeCurso());
 
         // Create labels for each item
         JLabel nomeAtividadeLabel = new JLabel("Nome da Atividade:");
@@ -46,7 +48,7 @@ public class SumarioAtividadeEstudante extends JFrame {
         JLabel cursoValue = new JLabel(curso != null ? curso.getNome() : "Curso não encontrado", SwingConstants.RIGHT);
         
         JLabel tipoLabel = new JLabel("Tipo:");
-        JLabel tipoValue = new JLabel(atividade.getTipo().toString(), SwingConstants.RIGHT);
+        JLabel tipoValue = new JLabel(atividade.getTipoAtividade().getNome(), SwingConstants.RIGHT);
 
         // Create label and button for Documento
         JLabel documentoLabel = new JLabel("Documento:");
@@ -179,7 +181,7 @@ public class SumarioAtividadeEstudante extends JFrame {
     public static void main(String[] args) {
         // For testing purposes
         GerenciadorCursos gerenciadorCursos = new GerenciadorCursos();
-        Atividade atividade = new Atividade(null, null, null, null, ALLBITS, null, null, ABORT, null);
+        Atividade atividade = new Atividade("Nome da Atividade", LocalDateTime.now(), "Pendente", "Descrição da Atividade", 123456, "Curso de Exemplo", new TipoAtividade("Tipo de Exemplo", 10, 0.5), 10, "path/to/documento.pdf");
         new SumarioAtividadeEstudante(atividade, gerenciadorCursos);
     }
 }

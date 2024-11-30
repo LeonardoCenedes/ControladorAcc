@@ -3,8 +3,7 @@ package views;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.UUID;
+import java.awt.event.ActionListener;   
 
 import controllers.GerenciadorEstudante;
 import controllers.GerenciadorCoordenador;
@@ -55,16 +54,16 @@ public class Login extends JFrame {
                         JOptionPane.showMessageDialog(Login.this, "Usuário e/ou senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else {
                         // Handle successful login for estudante
-                        new HomeUsuario(estudanteId, gerenciadorEstudante, gerenciadorAtividade, gerenciadorCursos);
+                        new HomeUsuario(estudanteId, gerenciadorEstudante, gerenciadorAtividade, gerenciadorCursos, gerenciadorCoordenador);
                         dispose(); // Close the login window
                     }
                 } else if (coordenadorRadioButton.isSelected()) {
-                    UUID coordenadorId = gerenciadorCoordenador.inserirDadosAutenticarCoordenador(email, senha);
-                    if (coordenadorId == null) {
+                    String cpfCoordenador = gerenciadorCoordenador.inserirDadosAutenticarCoordenador(email, senha);
+                    if (cpfCoordenador == "") {
                         JOptionPane.showMessageDialog(Login.this, "Usuário e/ou senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else {
                         // Handle successful login for coordenador
-                        new HomeCoordenador();
+                        new HomeCoordenador(cpfCoordenador, gerenciadorAtividade, gerenciadorCursos, gerenciadorCoordenador, gerenciadorEstudante);
                         dispose(); // Close the login window
                     }
                 } else {

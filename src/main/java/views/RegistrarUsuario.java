@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.UUID;
 
 import controllers.GerenciadorEstudante;
 import controllers.GerenciadorCursos;
@@ -18,7 +17,7 @@ public class RegistrarUsuario extends JFrame {
         setTitle("Registrar Usuário");
 
         // Set the default close operation
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Create labels
         JLabel raLabel = new JLabel("RA:");
@@ -65,9 +64,9 @@ public class RegistrarUsuario extends JFrame {
                     String email = emailField.getText();
                     String senha = new String(senhaField.getPassword());
                     Curso selectedCurso = (Curso) cursosDropdown.getSelectedItem();
-                    UUID idCurso = selectedCurso.getId();
+                    String nomeCurso = selectedCurso.getNome();
 
-                    boolean success = gerenciadorEstudante.inserirDadosRegistro(ra, nome, cpf, email, senha, idCurso);
+                    boolean success = gerenciadorEstudante.inserirDadosRegistro(ra, nome, cpf, email, senha, nomeCurso);
                     if (!success) {
                         JOptionPane.showMessageDialog(RegistrarUsuario.this, "Erro ao registrar usuário", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else {
