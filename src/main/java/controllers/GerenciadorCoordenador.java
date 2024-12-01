@@ -6,6 +6,9 @@ import java.util.List;
 
 import models.Atividade;
 import models.Coordenador;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import utils.HibernateUtil;
 
 public class GerenciadorCoordenador {
     private List<Coordenador> coordenadores;
@@ -18,11 +21,44 @@ public class GerenciadorCoordenador {
         this.gerenciadorAtividade = gerenciadorAtividade;
         this.gerenciadorCursos = gerenciadorCursos;
         this.gerenciadorEstudante = gerenciadorEstudante;
+        loadCoordenadoresFromDatabase();
+    }
+
+    private Session getSession() {
+        return HibernateUtil.getSessionFactory().openSession();
+    }
+
+    private void loadCoordenadoresFromDatabase() {
+        Session session = getSession();
+        try {
+            coordenadores = session.createQuery("from Coordenador", Coordenador.class).list();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void saveCoordenadoresToDatabase() {
+        Session session = getSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            for (Coordenador coordenador : coordenadores) {
+                session.saveOrUpdate(coordenador);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     public boolean inserirDadosCoordenador(String nome, String cpf, String email, String senha, String nomeCurso) {
         if (validarDadosCoordenador(nome, cpf, email, senha, nomeCurso)) {
-            Coordenador novoCoordenador = new Coordenador(nome, email,senha, cpf,  nomeCurso);
+            Coordenador novoCoordenador = new Coordenador(nome, email, senha, cpf, nomeCurso);
             coordenadores.add(novoCoordenador);
             return true;
         }
@@ -50,7 +86,6 @@ public class GerenciadorCoordenador {
 
     private Coordenador buscarPeloEmail(String email) {
         for (Coordenador coordenador : coordenadores) {
-            System.out.println(coordenador.getEmail());
             if (coordenador.getEmail().equals(email)) {
                 return coordenador;
             }
@@ -148,17 +183,17 @@ public class GerenciadorCoordenador {
     }
 
     public boolean negarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
-        return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario,nomeCurso , "Negado");
+        return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario, nomeCurso, "Negado");
     }
 
     public boolean aceitarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
-        Atividade atividade = gerenciadorAtividade.procurarAtividade(nomeAtividade,data, raUsuario, nomeCurso);
+        Atividade atividade = gerenciadorAtividade.procurarAtividade(nomeAtividade, data, raUsuario, nomeCurso);
         if (atividade == null) {
             return false;
         }
         double horas = gerenciadorAtividade.calcularHoras(atividade.getTipoAtividade(), atividade.getTotalHoras());
-        if(gerenciadorEstudante.atualizarHoras(atividade.getRaUsuario(), horas, atividade.getTipoAtividade())) {
-            return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario,nomeCurso , "Aprovada");
+        if (gerenciadorEstudante.atualizarHoras(atividade.getRaUsuario(), horas, atividade.getTipoAtividade())) {
+            return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario, nomeCurso, "Aprovada");
         }
         return false;
     }
@@ -181,6 +216,6 @@ public class GerenciadorCoordenador {
     }
 
     public boolean addTipoAtividade(String nome, int maxHoras, double coeficienteHoras, String nomeDoCurso) {
-        return gerenciadorEstudante.addTipoAtividadePorCurso(nomeDoCurso ,nome, maxHoras, coeficienteHoras);
+        return gerenciadorEstudante.addTipoAtividadePorCurso(nomeDoCurso, nome, maxHoras, coeficienteHoras);
     }
 }

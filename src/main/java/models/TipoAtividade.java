@@ -1,10 +1,22 @@
 package models;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "tipo_atividades")
 public class TipoAtividade {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     private String nome;
     private int maxHoras;
     private double horasAtuais;
     private double coeficienteHoras;
+
+    public TipoAtividade() {
+        // Default constructor for JPA
+    }
 
     public TipoAtividade(String nome, int maxHoras, double coeficienteHoras) {
         this.nome = nome;

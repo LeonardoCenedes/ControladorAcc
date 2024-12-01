@@ -1,13 +1,22 @@
 package models;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "coordenadores")
 public class Coordenador {
+    @Id
+    private String cpf;
+
     private String nome;
     private String email;
-    private String senha;  
-    private String cpf;
+    private String senha;
     private String nomeCurso;
     private String statusConta;
-    
+
+    // Default constructor for JPA
+    public Coordenador() {
+    }
 
     public Coordenador(String nome, String email, String senha, String cpf, String nomeCurso) {
         this.nome = nome;

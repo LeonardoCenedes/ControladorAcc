@@ -10,6 +10,10 @@ import controllers.GerenciadorCoordenador;
 import controllers.GerenciadorCursos;
 import controllers.GerenciadorAtividade;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import utils.HibernateUtil;
+
 public class Login extends JFrame {
 
     public Login(GerenciadorEstudante gerenciadorEstudante, GerenciadorCoordenador gerenciadorCoordenador, GerenciadorCursos gerenciadorCursos, GerenciadorAtividade gerenciadorAtividade) {
@@ -147,18 +151,59 @@ public class Login extends JFrame {
     }
 
     public static void main(String[] args) {
-        // Create instances of GerenciadorEstudante and GerenciadorCoordenador
-        GerenciadorCursos gerenciadorCursos = new GerenciadorCursos();
-        GerenciadorEstudante gerenciadorEstudante = new GerenciadorEstudante(gerenciadorCursos);
-        GerenciadorAtividade gerenciadorAtividade = new GerenciadorAtividade(gerenciadorCursos);
-        GerenciadorCoordenador gerenciadorCoordenador = new GerenciadorCoordenador(gerenciadorAtividade, gerenciadorCursos, gerenciadorEstudante);
-
-        // Insert default courses
-        gerenciadorCursos.inserirDadosCurso("Ciencia da Computação", 90);
-        gerenciadorCursos.inserirDadosCurso("Matematica", 160);
-        gerenciadorCursos.inserirDadosCurso("Historia", 360);
-
+        // Initialize Hibernate
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+    
+        // Declare variables outside the try block
+        GerenciadorCursos gerenciadorCursos = null;
+        GerenciadorEstudante gerenciadorEstudante = null;
+        GerenciadorAtividade gerenciadorAtividade = null;
+        GerenciadorCoordenador gerenciadorCoordenador = null;
+    
+        try {
+            transaction = session.beginTransaction();
+    
+            // Initialize the Gerenciador instances
+            gerenciadorCursos = new GerenciadorCursos();
+            gerenciadorEstudante = new GerenciadorEstudante(gerenciadorCursos);
+            gerenciadorAtividade = new GerenciadorAtividade(gerenciadorCursos);
+            gerenciadorCoordenador = new GerenciadorCoordenador(gerenciadorAtividade, gerenciadorCursos, gerenciadorEstudante);
+    
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    
+        // Ensure the Gerenciador instances are not null
+        final GerenciadorCursos finalGerenciadorCursos = gerenciadorCursos;
+        final GerenciadorEstudante finalGerenciadorEstudante = gerenciadorEstudante;
+        final GerenciadorAtividade finalGerenciadorAtividade = gerenciadorAtividade;
+        final GerenciadorCoordenador finalGerenciadorCoordenador = gerenciadorCoordenador;
+    
         // Create an instance of the Login class to display the window
-        new Login(gerenciadorEstudante, gerenciadorCoordenador, gerenciadorCursos, gerenciadorAtividade);
+        new Login(finalGerenciadorEstudante, finalGerenciadorCoordenador, finalGerenciadorCursos, finalGerenciadorAtividade);
+    
+        // Save changes to the database when the application closes
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (finalGerenciadorCursos != null) {
+                finalGerenciadorCursos.saveCursosToDatabase();
+            }
+            if (finalGerenciadorEstudante != null) {
+                finalGerenciadorEstudante.saveEstudantesToDatabase();
+            }
+            if (finalGerenciadorAtividade != null) {
+                finalGerenciadorAtividade.saveAtividadesToDatabase();
+            }
+            if (finalGerenciadorCoordenador != null) {
+                finalGerenciadorCoordenador.saveCoordenadoresToDatabase();
+            }
+            HibernateUtil.shutdown();
+        }));
     }
 }

@@ -6,6 +6,9 @@ import java.util.List;
 
 import models.Atividade;
 import models.TipoAtividade;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import utils.HibernateUtil;
 
 public class GerenciadorAtividade {
     private List<Atividade> atividades;
@@ -14,9 +17,38 @@ public class GerenciadorAtividade {
     public GerenciadorAtividade(GerenciadorCursos gerenciadorCursos) {
         this.atividades = new ArrayList<>();
         this.gerenciadorCursos = gerenciadorCursos;
+        loadAtividadesFromDatabase();
     }
 
-    public boolean preencherDadosAtividade(String nomeAtividade,LocalDateTime data, String descricao,  int raUsuario, String nomeCurso, TipoAtividade tipo, int totalHoras, String documento) {
+    private void loadAtividadesFromDatabase() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            atividades = session.createQuery("from Atividade", Atividade.class).list();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void saveAtividadesToDatabase() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            for (Atividade atividade : atividades) {
+                session.saveOrUpdate(atividade);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
+
+    public boolean preencherDadosAtividade(String nomeAtividade, LocalDateTime data, String descricao, int raUsuario, String nomeCurso, TipoAtividade tipo, int totalHoras, String documento) {
         if (validarDadosAtividade(nomeAtividade, descricao, data, raUsuario, nomeCurso)) {
             Atividade novaAtividade = new Atividade(nomeAtividade, data, "Pendente", descricao, raUsuario, nomeCurso, tipo, totalHoras, documento);
             atividades.add(novaAtividade);

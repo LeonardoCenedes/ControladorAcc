@@ -4,12 +4,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.Curso;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import utils.HibernateUtil;
 
 public class GerenciadorCursos {
     private List<Curso> cursos;
 
     public GerenciadorCursos() {
         this.cursos = new ArrayList<>();
+        loadCursosFromDatabase();
+    }
+
+    private void loadCursosFromDatabase() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            cursos = session.createQuery("from Curso", Curso.class).list();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void saveCursosToDatabase() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            for (Curso curso : cursos) {
+                session.saveOrUpdate(curso);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     public boolean inserirDadosCurso(String nome, int limiteHoras) {
@@ -79,5 +111,4 @@ public class GerenciadorCursos {
     public List<Curso> listarCursos() {
         return cursos;
     }
-    
 }

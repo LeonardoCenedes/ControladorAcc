@@ -6,6 +6,9 @@ import java.util.List;
 import models.Curso;
 import models.Estudante;
 import models.TipoAtividade;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import utils.HibernateUtil;
 
 public class GerenciadorEstudante {
     private List<Estudante> estudantes;
@@ -14,6 +17,39 @@ public class GerenciadorEstudante {
     public GerenciadorEstudante(GerenciadorCursos gerenciadorCursos) {
         this.gerenciadorCursos = gerenciadorCursos;
         this.estudantes = new ArrayList<>();
+        loadEstudantesFromDatabase();
+    }
+
+    private Session getSession() {
+        return HibernateUtil.getSessionFactory().openSession();
+    }
+
+    private void loadEstudantesFromDatabase() {
+        Session session = getSession();
+        try {
+            estudantes = session.createQuery("from Estudante", Estudante.class).list();
+        } finally {
+            session.close();
+        }
+    }
+
+    public void saveEstudantesToDatabase() {
+        Session session = getSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            for (Estudante estudante : estudantes) {
+                session.saveOrUpdate(estudante);
+            }
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     public int inserirDadosEstudante(String email, String senha) {
@@ -32,7 +68,7 @@ public class GerenciadorEstudante {
         if (estudante == null) {
             return 0;
         }
-        return estudante.getSenha().equals(senha) ? estudante.getRa() : null;
+        return estudante.getSenha().equals(senha) ? estudante.getRa() : 0;
     }
 
     public boolean inserirDadosRegistro(int ra, String nome, String cpf, String email, String senha, String nomeCurso) {
@@ -148,19 +184,19 @@ public class GerenciadorEstudante {
     }
 
     public boolean atualizarHoras(int ra, double horas, TipoAtividade tipo) {
-    for (Estudante estudante : estudantes) {
-        if (estudante.getRa() == ra) {
-            estudante.somarHoras(horas);
-            for (TipoAtividade tipoAtividade : estudante.getTipoAtividades()) {
-                if (tipoAtividade.getNome().equals(tipo.getNome())) {
-                    tipoAtividade.adicionarHoras(horas);;
-                    return true;
+        for (Estudante estudante : estudantes) {
+            if (estudante.getRa() == ra) {
+                estudante.somarHoras(horas);
+                for (TipoAtividade tipoAtividade : estudante.getTipoAtividades()) {
+                    if (tipoAtividade.getNome().equals(tipo.getNome())) {
+                        tipoAtividade.adicionarHoras(horas);
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
-    return false;
-}
 
     public String buscarNomePeloRa(int ra) {
         for (Estudante estudante : estudantes) {

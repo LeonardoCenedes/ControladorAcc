@@ -1,17 +1,33 @@
 package models;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "estudantes")
 public class Estudante {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ra;
+
     private String nome;
     private String cpf;
     private String email;
     private String senha;
     private String nomeCurso;
     private double totalHoras;
-    private List<TipoAtividade> tipoAtividades;
+
+    @Version
+    private int version;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "estudante_id")
+    private List<TipoAtividade> tipoAtividades = new ArrayList<>();
+
+    // Default constructor for JPA
+    public Estudante() {
+    }
 
     public Estudante(int ra, String nome, String cpf, String email, String senha, String nomeCurso) {
         this.ra = ra;
@@ -29,32 +45,14 @@ public class Estudante {
         this.tipoAtividades.add(new TipoAtividade("SemanaAcademica", 40, 0.4));
     }
 
-    public double getTotalHoras() {
-        return totalHoras;
-    }
-
-    public void setTotalHoras(double totalHoras) {
-        this.totalHoras = totalHoras;
-    }
-
-    public void somarHoras(double horas) {
-        this.totalHoras += horas;
-    }
-
-    public String getNomeCurso() {
-        return nomeCurso;
-    }
-
-    public void setNomeCurso(String nomeCurso) {
-        this.nomeCurso = nomeCurso;
-    }
-
-    public void setId(int ra) {
-        this.ra = ra;
-    }
+    // Getters and setters...
 
     public int getRa() {
         return ra;
+    }
+
+    public void setRa(int ra) {
+        this.ra = ra;
     }
 
     public String getNome() {
@@ -89,8 +87,36 @@ public class Estudante {
         this.senha = senha;
     }
 
+    public String getNomeCurso() {
+        return nomeCurso;
+    }
+
+    public void setNomeCurso(String nomeCurso) {
+        this.nomeCurso = nomeCurso;
+    }
+
+    public double getTotalHoras() {
+        return totalHoras;
+    }
+
+    public void setTotalHoras(double totalHoras) {
+        this.totalHoras = totalHoras;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     public List<TipoAtividade> getTipoAtividades() {
         return tipoAtividades;
+    }
+
+    public void setTipoAtividades(List<TipoAtividade> tipoAtividades) {
+        this.tipoAtividades = tipoAtividades;
     }
 
     public boolean addTipoAtividade(String nome, int maxHoras, double coeficienteHoras) {
@@ -101,5 +127,9 @@ public class Estudante {
         }
         TipoAtividade novoTipoAtividade = new TipoAtividade(nome, maxHoras, coeficienteHoras);
         return tipoAtividades.add(novoTipoAtividade);
+    }
+
+    public void somarHoras(double horas) {
+        this.totalHoras += horas;
     }
 }

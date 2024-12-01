@@ -1,8 +1,15 @@
 package models;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "atividades")
 public class Atividade {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     private String nomeAtividade;
     private LocalDateTime dataRealizacao;
     private String status;
@@ -11,7 +18,14 @@ public class Atividade {
     private int totalHoras;
     private int raUsuario;
     private String nomeCurso;
+
+    @ManyToOne
+    @JoinColumn(name = "tipo_atividade_id")
     private TipoAtividade tipoAtividade;
+
+    // Default constructor for JPA
+    public Atividade() {
+    }
 
     public Atividade(String nomeAtividade, LocalDateTime dataRealizacao, String status, String descricao, int raUsuario, String nomeCurso, TipoAtividade tipoAtividade, int totalHoras, String documento) {
         this.nomeAtividade = nomeAtividade;
