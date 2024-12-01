@@ -24,7 +24,7 @@ public class Coordenador {
         this.senha = senha;
         this.cpf = cpf;
         this.nomeCurso = nomeCurso;
-        this.statusConta = "Ativo";
+        this.statusConta = "Pendente";
     }
 
     public String getStatus() {
