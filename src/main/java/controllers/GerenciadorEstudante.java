@@ -39,7 +39,12 @@ public class GerenciadorEstudante {
         try {
             transaction = session.beginTransaction();
             for (Estudante estudante : estudantes) {
-                session.saveOrUpdate(estudante);
+                Estudante managedEstudante = session.find(Estudante.class, estudante.getRa());
+                if (managedEstudante != null) {
+                    session.merge(estudante);
+                } else {
+                    session.save(estudante);
+                }
             }
             transaction.commit();
         } catch (Exception e) {

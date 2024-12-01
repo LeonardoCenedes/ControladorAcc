@@ -71,6 +71,12 @@ public class SumarioAtividadeCoordenador extends JFrame {
         JButton aceitarButton = new JButton("Aceitar");
         JButton negarButton = new JButton("Negar");
 
+        // Disable buttons if the status is "Aprovado" or "Negado"
+        if ("Aprovada".equals(atividade.getStatus()) || "Negada".equals(atividade.getStatus())) {
+            aceitarButton.setEnabled(false);
+            negarButton.setEnabled(false);
+        }
+
         // Add action listener to the aceitarButton to accept the activity
         aceitarButton.addActionListener(new ActionListener() {
             @Override
@@ -216,7 +222,7 @@ public class SumarioAtividadeCoordenador extends JFrame {
         // For testing purposes
         GerenciadorCursos gerenciadorCursos = new GerenciadorCursos();
         GerenciadorCoordenador gerenciadorCoordenador = new GerenciadorCoordenador(null, gerenciadorCursos, null);
-        Atividade atividade = new Atividade("Nome da Atividade", LocalDateTime.now(), "Pendente", "Descrição da Atividade", 123456, "Curso de Exemplo", new TipoAtividade("Tipo de Exemplo", 10, 0.5), 10, "path/to/documento.pdf");
+        Atividade atividade = new Atividade("Nome da Atividade", LocalDateTime.now(), "Aprovado", "Descrição da Atividade", 123456, "Curso de Exemplo", new TipoAtividade("Tipo de Exemplo", 10, 0.5), 10, "path/to/documento.pdf");
         new SumarioAtividadeCoordenador(atividade, gerenciadorCursos, gerenciadorCoordenador);
     }
 }

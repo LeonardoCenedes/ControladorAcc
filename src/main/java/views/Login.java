@@ -63,7 +63,7 @@ public class Login extends JFrame {
                     }
                 } else if (coordenadorRadioButton.isSelected()) {
                     String cpfCoordenador = gerenciadorCoordenador.inserirDadosAutenticarCoordenador(email, senha);
-                    if (cpfCoordenador == "") {
+                    if (cpfCoordenador == null) {
                         JOptionPane.showMessageDialog(Login.this, "Usuário e/ou senha incorretos", "Erro", JOptionPane.ERROR_MESSAGE);
                     } else {
                         // Handle successful login for coordenador

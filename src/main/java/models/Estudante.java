@@ -21,7 +21,7 @@ public class Estudante {
     @Version
     private int version;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "estudante_id")
     private List<TipoAtividade> tipoAtividades = new ArrayList<>();
 
