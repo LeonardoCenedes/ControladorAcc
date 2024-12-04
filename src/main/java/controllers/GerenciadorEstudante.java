@@ -196,11 +196,17 @@ public class GerenciadorEstudante {
     public boolean atualizarHoras(int ra, double horas, TipoAtividade tipo) {
         for (Estudante estudante : estudantes) {
             if (estudante.getRa() == ra) {
-                estudante.somarHoras(horas);
                 for (TipoAtividade tipoAtividade : estudante.getTipoAtividades()) {
                     if (tipoAtividade.getNome().equals(tipo.getNome())) {
-                        tipoAtividade.adicionarHoras(horas);
-                        return true;
+                        double horasAtuais = tipoAtividade.getHorasAtuais();
+                        double maxHoras = tipoAtividade.getTotalHoras();
+                        double horasParaAdicionar = Math.min(horas, maxHoras - horasAtuais);
+    
+                        if (horasParaAdicionar > 0) {
+                            tipoAtividade.adicionarHoras(horasParaAdicionar);
+                            estudante.somarHoras(horasParaAdicionar);
+                            return true;
+                        }
                     }
                 }
             }

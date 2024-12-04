@@ -42,7 +42,7 @@ public class HomeUsuario extends JFrame {
         // Add action listener to the perfilButton
         perfilButton.addActionListener(e -> {
             Estudante estudante = gerenciadorEstudante.buscarEstudantePeloRa(ra);
-            new Perfil(estudante);
+            new Perfil(estudante, gerenciadorCursos);
         });
 
         // Create a panel and add components to it

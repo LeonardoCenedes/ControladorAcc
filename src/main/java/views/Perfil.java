@@ -2,20 +2,28 @@ package views;
 
 import models.Estudante;
 import models.TipoAtividade;
+import models.Curso;
+import controllers.GerenciadorCursos;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Perfil extends JFrame {
 
-    public Perfil(Estudante estudante) {
+    public Perfil(Estudante estudante, GerenciadorCursos gerenciadorCursos) {
         // Set the title of the window
         setTitle("Perfil do Estudante");
 
         // Set the default close operation
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        // Search for the Curso by the name of the student's course
+        Curso curso = gerenciadorCursos.buscarCurso(estudante.getNomeCurso());
+        String cursoLimite = curso != null ? "Limite do Curso: " + curso.getLimiteHoras() + " horas" : "Curso não encontrado";
+
         // Create labels and fields for each attribute of Estudante
+        JLabel cursoLimiteLabel = new JLabel(cursoLimite, SwingConstants.LEFT);
+
         JLabel raLabel = new JLabel("RA:");
         JLabel raValue = new JLabel(String.valueOf(estudante.getRa()), SwingConstants.RIGHT);
 
@@ -45,67 +53,72 @@ public class Perfil extends JFrame {
         // Add components to the panel
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        panel.add(cursoLimiteLabel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 1;
         panel.add(raLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(raValue, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(nomeLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(nomeValue, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(cpfLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(cpfValue, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(emailLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(emailValue, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(nomeCursoLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(nomeCursoValue, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.WEST;
         panel.add(totalHorasLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.EAST;
         panel.add(totalHorasValue, gbc);
 
         // Add TipoAtividade in a hierarchical view
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 7;
         gbc.gridwidth = 2;
         for (TipoAtividade tipoAtividade : estudante.getTipoAtividades()) {
             JPanel tipoPanel = new JPanel(new BorderLayout());
@@ -131,7 +144,8 @@ public class Perfil extends JFrame {
 
     public static void main(String[] args) {
         // For testing purposes
+        GerenciadorCursos gerenciadorCursos = new GerenciadorCursos();
         Estudante estudante = new Estudante(123456, "João Silva", "123.456.789-00", "joao.silva@example.com", "senha123", "Curso de Exemplo");
-        new Perfil(estudante);
+        new Perfil(estudante, gerenciadorCursos);
     }
 }
