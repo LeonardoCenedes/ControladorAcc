@@ -183,7 +183,7 @@ public class GerenciadorCoordenador {
     }
 
     public boolean negarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
-        return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario, nomeCurso, "Negado");
+        return gerenciadorAtividade.atualizarStatusAtividade(nomeAtividade, data, raUsuario, nomeCurso, "Negada");
     }
 
     public boolean aceitarAtividade(String nomeAtividade, LocalDateTime data, int raUsuario, String nomeCurso) {
