@@ -250,18 +250,20 @@ public class GerenciadorEstudante {
         return false;
     }
 
-    public boolean atualizarTipoAtividadePorCurso(String nomeCurso, String nomeTipo, int totalHoras) {
+    public boolean atualizarTipoAtividadePorCurso(String nomeCurso, String nomeTipoAtividade, int maxHoras, double coeficiente) {
+        boolean updated = false;
         for (Estudante estudante : estudantes) {
             if (estudante.getNomeCurso().equals(nomeCurso)) {
                 for (TipoAtividade tipoAtividade : estudante.getTipoAtividades()) {
-                    if (tipoAtividade.getNome().equals(nomeTipo)) {
-                        tipoAtividade.setTotalHoras(totalHoras);
-                        return true;
+                    if (tipoAtividade.getNome().equals(nomeTipoAtividade)) {
+                        tipoAtividade.setTotalHoras(maxHoras);
+                        tipoAtividade.setCoeficienteHoras(coeficiente);
+                        updated = true;
                     }
                 }
             }
         }
-        return false;
+        return updated;
     }
 
     public List<Estudante> buscarEstudantesPorCurso(String nomeCurso) {

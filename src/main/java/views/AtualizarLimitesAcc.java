@@ -27,6 +27,12 @@ public class AtualizarLimitesAcc extends JFrame {
         JLabel maxHorasLabel = new JLabel("Máximo de Horas:");
         JTextField maxHorasField = new JTextField(20);
 
+        JLabel coeficienteLabel = new JLabel("Coeficiente:");
+        JTextField coeficienteField = new JTextField(20);
+
+        JLabel currentMaxHorasLabel = new JLabel("Atual Máximo de Horas: ");
+        JLabel currentCoeficienteLabel = new JLabel("Atual Coeficiente: ");
+
         // Fetch the Estudante object using the coordenador's course
         List<Estudante> estudantes = gerenciadorEstudante.buscarEstudantesPorCurso(coordenador.getNomeCurso());
         Estudante estudante = estudantes.isEmpty() ? null : estudantes.get(0);
@@ -45,35 +51,75 @@ public class AtualizarLimitesAcc extends JFrame {
             }
         });
 
+        // Add action listener to the dropdown to update labels
+        tipoDropdown.addActionListener(e -> {
+            TipoAtividade selectedTipo = (TipoAtividade) tipoDropdown.getSelectedItem();
+            if (selectedTipo != null) {
+                currentMaxHorasLabel.setText("Atual Máximo de Horas: " + selectedTipo.getTotalHoras());
+                currentCoeficienteLabel.setText("Atual Coeficiente: " + selectedTipo.getCoeficienteHoras());
+            }
+        });
+
+        // Set initial selection and update labels
+        if (tipoDropdown.getItemCount() > 0) {
+            tipoDropdown.setSelectedIndex(0);
+            TipoAtividade selectedTipo = (TipoAtividade) tipoDropdown.getSelectedItem();
+            if (selectedTipo != null) {
+                currentMaxHorasLabel.setText("Atual Máximo de Horas: " + selectedTipo.getTotalHoras());
+                currentCoeficienteLabel.setText("Atual Coeficiente: " + selectedTipo.getCoeficienteHoras());
+            }
+        }
+
         // Create update button
         JButton updateButton = new JButton("Atualizar");
 
         // Add action listener to the update button
         updateButton.addActionListener(e -> {
             String maxHorasText = maxHorasField.getText();
-            if (maxHorasText.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "O campo de máximo de horas não pode estar vazio.", "Erro", JOptionPane.ERROR_MESSAGE);
+            String coeficienteText = coeficienteField.getText();
+
+            if (maxHorasText.isEmpty() || coeficienteText.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Os campos de máximo de horas e coeficiente não podem estar vazios.", "Erro", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Check for pending activities
-            List<Atividade> atividadesPendentes = gerenciadorAtividade.buscarPorCursoeStatus(coordenador.getNomeCurso(), "Pendente");
-            if (!atividadesPendentes.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Existem atividades pendentes. Por favor, verifique todas as atividades pendentes antes de continuar.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // Update TipoAtividade
-            TipoAtividade selectedTipo = (TipoAtividade) tipoDropdown.getSelectedItem();
-            if (selectedTipo != null) {
+            try {
                 int maxHoras = Integer.parseInt(maxHorasText);
-                boolean success = gerenciadorEstudante.atualizarTipoAtividadePorCurso(coordenador.getNomeCurso(), selectedTipo.getNome(), maxHoras);
-                if (success) {
-                    JOptionPane.showMessageDialog(this, "Limite de horas atualizado com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                    dispose(); // Close the window after successful update
-                } else {
-                    JOptionPane.showMessageDialog(this, "Erro ao atualizar o limite de horas.", "Erro", JOptionPane.ERROR_MESSAGE);
+                double coeficiente = Double.parseDouble(coeficienteText);
+
+                if (coeficiente < 0.1 || coeficiente > 1) {
+                    JOptionPane.showMessageDialog(this, "O coeficiente deve estar entre 0.1 e 1.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
+
+                // Check for pending activities
+                List<Atividade> atividadesPendentes = gerenciadorAtividade.buscarPorCursoeStatus(coordenador.getNomeCurso(), "Pendente");
+                if (!atividadesPendentes.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Existem atividades pendentes. Por favor, verifique todas as atividades pendentes antes de continuar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                // Update TipoAtividade
+                TipoAtividade selectedTipo = (TipoAtividade) tipoDropdown.getSelectedItem();
+                if (selectedTipo != null) {
+                    boolean maxHorasChanged = maxHoras != selectedTipo.getTotalHoras();
+                    boolean coeficienteChanged = coeficiente != selectedTipo.getCoeficienteHoras();
+
+                    if (!maxHorasChanged && !coeficienteChanged) {
+                        JOptionPane.showMessageDialog(this, "Para atualizar, você deve alterar pelo menos um dos campos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    boolean success = gerenciadorEstudante.atualizarTipoAtividadePorCurso(coordenador.getNomeCurso(), selectedTipo.getNome(), maxHoras, coeficiente);
+                    if (success) {
+                        JOptionPane.showMessageDialog(this, "Limite de horas e coeficiente atualizados com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        dispose(); // Close the window after successful update
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Erro ao atualizar o limite de horas e coeficiente.", "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Formato inválido para máximo de horas ou coeficiente.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -87,22 +133,38 @@ public class AtualizarLimitesAcc extends JFrame {
         // Add components to the panel
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(maxHorasLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        panel.add(maxHorasField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
         panel.add(new JLabel("Tipo de Atividade:"), gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 0;
         panel.add(tipoDropdown, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(currentMaxHorasLabel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panel.add(maxHorasLabel, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
+        panel.add(maxHorasField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        panel.add(currentCoeficienteLabel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        panel.add(coeficienteLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        panel.add(coeficienteField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 5;
         panel.add(updateButton, gbc);
 
         // Add the panel to the frame
