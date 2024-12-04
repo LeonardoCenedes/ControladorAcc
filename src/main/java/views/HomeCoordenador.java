@@ -44,12 +44,16 @@ public class HomeCoordenador extends JFrame {
             new PerfilCoordenador(coordenador);
         });
 
-        
-
         // Create a button for AdicionarTipoCurso
         JButton adicionarTipoButton = new JButton("Adicionar Tipo");
         adicionarTipoButton.addActionListener(e -> {
             new AdicionarTipoCurso(coordenador, gerenciadorCoordenador);
+        });
+
+        // Create a button for AtualizarLimitesAcc
+        JButton atualizarTiposButton = new JButton("Atualizar Tipos");
+        atualizarTiposButton.addActionListener(e -> {
+            new AtualizarLimitesAcc(coordenador, gerenciadorAtividade, gerenciadorEstudante, gerenciadorCoordenador);
         });
 
         // Create a toolbar with four options
@@ -130,12 +134,13 @@ public class HomeCoordenador extends JFrame {
         panel.setLayout(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(64, 64, 64, 64)); // Add padding around the contents
 
-        // Create a panel for the top section with the name label, perfil button, listaAtividades button, adicionarTipo button, and sair button
+        // Create a panel for the top section with the name label, perfil button, listaAtividades button, adicionarTipo button, atualizarTipos button, and sair button
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(nomeLabel, BorderLayout.WEST);
         JPanel topRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         topRightPanel.add(perfilButton);
         topRightPanel.add(adicionarTipoButton);
+        topRightPanel.add(atualizarTiposButton);
         JButton sairButton = new JButton("Sair");
         sairButton.addActionListener(e -> {
             new Login(gerenciadorEstudante, gerenciadorCoordenador, gerenciadorCursos, gerenciadorAtividade);

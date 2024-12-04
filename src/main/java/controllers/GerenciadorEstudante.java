@@ -243,4 +243,28 @@ public class GerenciadorEstudante {
         }
         return false;
     }
+
+    public boolean atualizarTipoAtividadePorCurso(String nomeCurso, String nomeTipo, int totalHoras) {
+        for (Estudante estudante : estudantes) {
+            if (estudante.getNomeCurso().equals(nomeCurso)) {
+                for (TipoAtividade tipoAtividade : estudante.getTipoAtividades()) {
+                    if (tipoAtividade.getNome().equals(nomeTipo)) {
+                        tipoAtividade.setTotalHoras(totalHoras);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public List<Estudante> buscarEstudantesPorCurso(String nomeCurso) {
+        List<Estudante> estudantesPorCurso = new ArrayList<>();
+        for (Estudante estudante : estudantes) {
+            if (estudante.getNomeCurso().equals(nomeCurso)) {
+                estudantesPorCurso.add(estudante);
+            }
+        }
+        return estudantesPorCurso;
+    }
 }
