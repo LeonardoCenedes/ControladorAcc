@@ -2,6 +2,7 @@ package views;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import controllers.GerenciadorAtividade;
@@ -31,7 +32,7 @@ public class AtualizarLimitesAcc extends JFrame {
         Estudante estudante = estudantes.isEmpty() ? null : estudantes.get(0);
 
         // Create dropdown for TipoAtividade
-        List<TipoAtividade> tipoAtividades = estudante != null ? estudante.getTipoAtividades() : List.of();
+        List<TipoAtividade> tipoAtividades = estudante != null ? estudante.getTipoAtividades() : new ArrayList<>();
         JComboBox<TipoAtividade> tipoDropdown = new JComboBox<>(tipoAtividades.toArray(new TipoAtividade[0]));
         tipoDropdown.setRenderer(new DefaultListCellRenderer() {
             @Override
