@@ -57,6 +57,11 @@ public class GerenciadorCoordenador {
     }
 
     public boolean inserirDadosCoordenador(String nome, String cpf, String email, String senha, String nomeCurso) {
+        for (Coordenador coordenador : coordenadores) {
+            if (coordenador.getCpf().equals(cpf) || coordenador.getEmail().equals(email)) {
+                return false;
+            }
+        }
         if (validarDadosCoordenador(nome, cpf, email, senha, nomeCurso)) {
             Coordenador novoCoordenador = new Coordenador(nome, email, senha, cpf, nomeCurso);
             coordenadores.add(novoCoordenador);

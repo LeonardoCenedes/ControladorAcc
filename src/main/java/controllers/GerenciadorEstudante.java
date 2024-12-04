@@ -77,6 +77,11 @@ public class GerenciadorEstudante {
     }
 
     public boolean inserirDadosRegistro(int ra, String nome, String cpf, String email, String senha, String nomeCurso) {
+        for (Estudante estudante : estudantes) {
+            if (estudante.getRa() == ra || estudante.getCpf().equals(cpf) || estudante.getEmail().equals(email)) {
+                return false;
+            }
+        }
         if (validarDadosRegistro(ra, nome, cpf, email, senha, nomeCurso)) {
             Estudante novoEstudante = new Estudante(ra, nome, cpf, email, senha, nomeCurso);
             estudantes.add(novoEstudante);
