@@ -89,7 +89,9 @@ public class CriarNovaAtividade extends JFrame {
             int returnValue = fileChooser.showOpenDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 selectedFilePath = fileChooser.getSelectedFile().getPath();
-                filePathLabel.setText(fileChooser.getSelectedFile().getName());
+                String fileName = fileChooser.getSelectedFile().getName();
+                String truncatedFileName = truncateFileName(fileName, 32);
+                filePathLabel.setText(truncatedFileName);
             }
             fileButton.setEnabled(true); // Re-enable the button after the file chooser is closed
         });
@@ -209,6 +211,13 @@ public class CriarNovaAtividade extends JFrame {
                 dispose(); // Close the window
             }
         });
+    }
+
+    private String truncateFileName(String fileName, int maxLength) {
+        if (fileName.length() <= maxLength) {
+            return fileName;
+        }
+        return fileName.substring(0, maxLength - 3) + "...";
     }
 
     public static void main(String[] args) {

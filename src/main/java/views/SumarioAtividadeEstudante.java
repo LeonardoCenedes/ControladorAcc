@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import controllers.GerenciadorAtividade;
 import controllers.GerenciadorCursos;
 import models.Atividade;
 import models.Curso;
@@ -15,7 +16,7 @@ import models.TipoAtividade;
 
 public class SumarioAtividadeEstudante extends JFrame {
 
-    public SumarioAtividadeEstudante(Atividade atividade, GerenciadorCursos gerenciadorCursos) {
+    public SumarioAtividadeEstudante(Atividade atividade, GerenciadorCursos gerenciadorCursos, GerenciadorAtividade gerenciadorAtividade, ListaAtividadesEstudante listaAtividadesEstudante) {
         // Set the title of the window
         setTitle("Sumário da Atividade");
 
@@ -52,6 +53,8 @@ public class SumarioAtividadeEstudante extends JFrame {
 
         // Create label and button for Documento
         JLabel documentoLabel = new JLabel("Documento:");
+        String truncatedFileName = truncateFileName(atividade.getDocumento(), 32);
+        JLabel documentoValue = new JLabel(truncatedFileName, SwingConstants.RIGHT);
         JButton abrirButton = new JButton("Abrir");
 
         // Add action listener to the abrirButton to open the document
@@ -62,6 +65,28 @@ public class SumarioAtividadeEstudante extends JFrame {
                     Desktop.getDesktop().open(new File(atividade.getDocumento()));
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(SumarioAtividadeEstudante.this, "Erro ao abrir o documento", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        // Create the "Deletar" button
+        JButton deletarButton = new JButton("Deletar");
+
+        // Add action listener to the deletarButton to delete the activity if status is "Pendente"
+        deletarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ("Pendente".equals(atividade.getStatus())) {
+                    boolean deleted = gerenciadorAtividade.deletarAtividade(atividade.getNomeAtividade(), atividade.getData(), atividade.getRaUsuario(), atividade.getNomeCurso());
+                    if (deleted) {
+                        JOptionPane.showMessageDialog(SumarioAtividadeEstudante.this, "Atividade deletada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                        listaAtividadesEstudante.updateActivityList(gerenciadorAtividade.buscarAtividadesPorUsuario(atividade.getRaUsuario()));
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(SumarioAtividadeEstudante.this, "Erro ao deletar a atividade", "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(SumarioAtividadeEstudante.this, "A atividade não pode ser deletada porque não está pendente", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -163,7 +188,18 @@ public class SumarioAtividadeEstudante extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 8;
         gbc.anchor = GridBagConstraints.EAST;
+        panel.add(documentoValue, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 9;
+        gbc.anchor = GridBagConstraints.EAST;
         panel.add(abrirButton, gbc);
+
+        // Add the deletarButton to the panel
+        gbc.gridx = 0;
+        gbc.gridy = 10;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(deletarButton, gbc);
 
         // Add the panel to the frame
         add(panel);
@@ -178,10 +214,19 @@ public class SumarioAtividadeEstudante extends JFrame {
         setVisible(true);
     }
 
+    private String truncateFileName(String fileName, int maxLength) {
+        if (fileName.length() <= maxLength) {
+            return fileName;
+        }
+        return fileName.substring(0, maxLength - 3) + "...";
+    }
+
     public static void main(String[] args) {
         // For testing purposes
         GerenciadorCursos gerenciadorCursos = new GerenciadorCursos();
+        GerenciadorAtividade gerenciadorAtividade = new GerenciadorAtividade(gerenciadorCursos);
         Atividade atividade = new Atividade("Nome da Atividade", LocalDateTime.now(), "Pendente", "Descrição da Atividade", 123456, "Curso de Exemplo", new TipoAtividade("Tipo de Exemplo", 10, 0.5), 10, "path/to/documento.pdf");
-        new SumarioAtividadeEstudante(atividade, gerenciadorCursos);
+        ListaAtividadesEstudante listaAtividadesEstudante = new ListaAtividadesEstudante(123456, gerenciadorAtividade, gerenciadorCursos);
+        new SumarioAtividadeEstudante(atividade, gerenciadorCursos, gerenciadorAtividade, listaAtividadesEstudante);
     }
 }

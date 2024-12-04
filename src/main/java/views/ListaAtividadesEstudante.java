@@ -15,9 +15,7 @@ public class ListaAtividadesEstudante extends JFrame {
     private JList<String> itemList;
     private JScrollPane listScrollPane;
     private JPanel panel;
-    private GerenciadorCursos gerenciadorCursos;
     public ListaAtividadesEstudante(int raUsuario, GerenciadorAtividade gerenciadorAtividade, GerenciadorCursos gerenciadorCursos) {
-        this.gerenciadorCursos = gerenciadorCursos;
         // Set the title of the window
         setTitle("Lista de Atividades");
 
@@ -88,7 +86,7 @@ public class ListaAtividadesEstudante extends JFrame {
                 if (e.getClickCount() == 2) {
                     int index = itemList.locationToIndex(e.getPoint());
                     Atividade selectedAtividade = atividades.get(index);
-                    new SumarioAtividadeEstudante(selectedAtividade, gerenciadorCursos);
+                    new SumarioAtividadeEstudante(selectedAtividade, gerenciadorCursos, gerenciadorAtividade, ListaAtividadesEstudante.this);
                 }
             }
         });
@@ -119,22 +117,14 @@ public class ListaAtividadesEstudante extends JFrame {
 
         // Set the frame to be visible
         setVisible(true);
+
+        // Initial load of activities
+        updateActivityList(atividades);
     }
 
-    private void updateActivityList(List<Atividade> atividades) {
+    public void updateActivityList(List<Atividade> atividades) {
         String[] activityNames = atividades.stream().map(Atividade::getNomeAtividade).toArray(String[]::new);
         itemList.setListData(activityNames);
-
-        // Add a mouse listener for double-click events
-        itemList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int index = itemList.locationToIndex(e.getPoint());
-                    Atividade selectedAtividade = atividades.get(index);
-                    new SumarioAtividadeEstudante(selectedAtividade, gerenciadorCursos);
-                }
-            }
-        });
 
         // Refresh the panel
         panel.revalidate();
